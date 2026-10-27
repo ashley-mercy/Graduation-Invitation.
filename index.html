@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graduation Invitation</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-front: #1e293b;
+      --card-inside: #f8fafc;
+      --gold: #d97706;
+      --gold-light: #fbbf24;
+      --text-dark: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      perspective: 1500px;
+    }
+
+    .instruction {
+      color: #94a3b8;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    .card-container {
+      width: 380px;
+      height: 560px;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-container.open {
+      transform: rotateY(-180deg);
+    }
+
+    .card-front, .card-inside {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      backface-visibility: hidden;
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid var(--gold);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+      color: #fff;
+    }
+
+    .cap-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 10px rgba(217, 119, 6, 0.5));
+    }
+
+    .card-front h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .card-front p {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+
+    .tap-hint {
+      margin-top: 30px;
+      padding: 8px 16px;
+      background: rgba(217, 119, 6, 0.2);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--gold-light);
+    }
+
+    .card-inside {
+      background: var(--card-inside);
+      color: var(--text-dark);
+      transform: rotateY(180deg);
+      padding: 30px 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      border: 4px double var(--gold);
+    }
+
+    .card-inside h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+
+    .card-inside .graduate-name {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin: 8px 0 4px 0;
+    }
+
+    .card-inside .degree {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .gift-quote {
+      font-style: italic;
+      font-size: 0.82rem;
+      color: #475569;
+      margin: 12px 0 8px 0;
+      padding: 8px 12px;
+      border-left: 3px solid var(--gold);
+      background: #f1f5f9;
+      border-radius: 0 8px 8px 0;
+      text-align: center;
+    }
+
+    .details-box {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 8px 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .details-box strong {
+      color: var(--gold);
+    }
+
+    .rsvp-btn {
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .rsvp-btn:hover {
+      background: #b45309;
+      transform: scale(1.05);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="instruction">Click the invitation to open</div>
+
+  <!-- Interactive 3D Card -->
+  <div class="card-container" id="card" onclick="toggleCard()">
+    <div class="card-front">
+      <div class="cap-icon">🎓</div>
+      <h2>YOU'RE INVITED!</h2>
+      <p>Welcome to Ashley's Graduation Celebration</p>
+      <div class="tap-hint">Tap to Open</div>
+    </div>
+
+    <div class="card-inside">
+      <div>
+        <h1>Class of 2026</h1>
+        <p>Please join us as we celebrate</p>
+        <div class="graduate-name">Ashley Mercy (Mitchelle)</div>
+        <div class="degree">Bachelor of Science in Economics</div>
+      </div>
+
+      <!-- Gift Encouragement Quote Section -->
+      <div class="gift-quote">
+        🎁 <em>"Your presence is our greatest gift, but if you wish to honor the graduate, cash and gifts are warmly welcomed!"</em>
+      </div>
+
+      <div class="details-box">
+        <p><strong>📅 Date:</strong> Saturday, November 14, 2026</p>
+        <p><strong>⏰ Time:</strong> 10:00 AM EAT</p>
+        <p><strong>📍 Venue:</strong> Elmolo Grille (https://maps.app.goo.gl/xufr8utkz4gH6Gov6?g_st=ac)</p>
+        <p><strong> Theme: </strong></p>
+      </div>
+
+      <button class="rsvp-btn" onclick="openModal(event)">RSVP Now</button>
+    </div>
+  </div>
+
+  <!-- RSVP Modal Popup -->
+  <div class="modal" id="rsvpModal">
+    <div class="modal-content">
+      <h3>RSVP</h3>
+      <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">We hope to see you there!</p>
+      <form id="rsvpForm" onsubmit="submitRSVP(event)">
+        <input type="text" id="guestName" placeholder="Your Name" required />
+        <input type="number" id="guestCount" placeholder="Number of Guests" min="1" max="5" required />
+        <button type="submit" id="submitBtn" class="rsvp-btn" style="width: 100%; margin-top: 10px;">Send RSVP</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let isOpen = false;
+
+    function toggleCard() {
+      const card = document.getElementById('card');
+      card.classList.toggle('open');
+      isOpen = !isOpen;
+
+      if (isOpen) {
+        setTimeout(() => {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }, 400);
+      }
+    }
+
+    function openModal(e) {
+      e.stopPropagation();
+      document.getElementById('rsvpModal').style.display = 'flex';
+    }
+
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BETWEEN THE QUOTES BELOW:
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywNrR7KbD33BOmn6VhVokfXtQMZp0yAVYBEANdUolEJjDL9V2FTAXruxpTGLDcUhKB/exec';
+
+    async function submitRSVP(e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.innerText = 'Sending...';
+      submitBtn.disabled = true;
+
+      const data = {
+        name: document.getElementById('guestName').value,
+        guests: document.getElementById('guestCount').value
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        alert('Thank you! Your RSVP has been saved.');
+        document.getElementById('rsvpModal').style.display = 'none';
+        document.getElementById('rsvpForm').reset();
+      } catch (error) {
+        alert('Something went wrong. Please try again.');
+        console.error('Error:', error);
+      } finally {
+        submitBtn.innerText = 'Send RSVP';
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const modal = document.getElementById('rsvpModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+
+</body>
+</html>
